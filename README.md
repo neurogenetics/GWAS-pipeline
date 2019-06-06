@@ -175,7 +175,9 @@ for(i in 1:22)
 
 ### Imputed genotype data
 
-This is the .vcf file that is the output from the imputation server
+This is the .vcf file that is the output from the imputation server.
+
+They should be in this format chr$CHNUM.dose.vcf.gz
 
 ### Running the GWAS
 
