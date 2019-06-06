@@ -89,11 +89,51 @@ Eagle Imputation: https://www.ncbi.nlm.nih.gov/pubmed/27694958
 For running GWAS many many tools and programs are available. We most commonly use either RVTESTS or PLINK. 
 
 ## Covariate generation
+Covariates should always be included when running GWAS, we typically include at least AGE, SEX and PC1-5. AGE and SEX you (hopefully) already have. PC1-5 you can generate using several programs we typically use either PLINK or FlashPCA for this.
 
+Plink:
+```
+# Filter data
+plink --bfile FILENAME --maf 0.01 --geno 0.01 --hwe 5e-6 --autosome --exclude exclusion_regions_hg19.txt 
+--make-bed --out FILENAME_2  
+# Prune snps 
+plink --bfile FILENAME_2 --indep-pairwise 1000 10 0.02 --autosome --out pruned_data
+# Extract pruned SNPs and only these variants will be used for PC calculation
+plink --bfile FILENAME_2 --extract pruned_data.prune.in --make-bed --out FILENAME_3 
+# Calculate/generate PCs based on pruned data set
+plink --bfile FILENAME_3 --pca --out PCA
+# then use the .eigenvec file
+```
 
+FlashPCA (you can speed up things by adding --memory 119500 --threads 19 in PLINK and --numthreads 19 in FlashPCA
+```
+# Filter data
+plink --bfile FILENAME --maf 0.01 --geno 0.01 --hwe 5e-6 --autosome --exclude exclusion_regions_hg19.txt 
+--make-bed --out FILENAME_2  
+# Prune snps 
+plink --bfile FILENAME_2 --indep-pairwise 1000 10 0.02 --autosome --out pruned_data
+# Extract pruned SNPs and only these variants will be used for PC calculation
+plink --bfile FILENAME_2 --extract pruned_data.prune.in --make-bed --out FILENAME_3 
+# Calculate/generate PCs based on pruned data set
+flashpca --bfile FILENAME_3 --suffix _filter_pruned_forPCA.txt --numthreads 19
+# then use the .* file
+```
 
+Note that it is recommend (by FlashPCA authors and others) to exclude some regions prior creating PC's
 
-## RVTESTS
+hg19:
+```
+5 44000000 51500000 r1
+6 25000000 33500000 r2
+8 8000000 12000000 r3
+11 45000000 57000000 r4
+```
+hg38:
+```
+
+```
+
+## Option1: RVTESTS
 Why RVTESTS? It is very easy to use due to the similar file structure as PLINK takes, it has a good manual and it has very flexible options to use.
 
 Files needed to run GWAS:
@@ -101,7 +141,7 @@ Files needed to run GWAS:
 2. Regions file
 3. Imputed genotype data
 
-### Phenotype file
+### Phenotype file (and also covariate file)
 Structure is very similar to PLINK. We generally add a couple of columns such as: SEX_cov,pheno_01,AGE,dataset,PC1-PC10
 
 - SEX_cov is sex-1 this is because some programs prefer binairy coding of covariates over 1 and 2
@@ -221,7 +261,7 @@ rvtest --noweb --hide-covar --rangeFile maf001rsq03minimums_chr$CHNUM.txt \
 --peopleIncludeFile $KEEPFILE.txt  == keep file from STEP1
 ```
 
-## PLINK
+## Option2: PLINK
 Why PLINK? It is very easy to use, it has a good manual and it has very flexible options to use.
 PLINK2 is often used, but typically that means version 1.9. The actual PLINK2 version is still under development and the first releases look very promising (https://www.cog-genomics.org/plink/2.0/) incredibly fast.
 
@@ -244,6 +284,8 @@ work in progress
 
 ### References:
 
+FlashPCA: https://www.ncbi.nlm.nih.gov/pubmed/28475694
+
 RVTESTS: https://www.ncbi.nlm.nih.gov/pubmed/27153000
 
 PLINK: https://www.ncbi.nlm.nih.gov/pubmed/25722852
@@ -251,6 +293,36 @@ PLINK: https://www.ncbi.nlm.nih.gov/pubmed/25722852
 
 # 4. Optional meta-analyses
 Meta-analyses are used when you have multiple datasets.
+
+## Prep of your GWAS results (based on RVTEST file)
+
+merge all GWAS files per chromosome and merge all .info files
+```
+cat *.SingleWald.assoc | grep -v 'N_INFORMATIVE' > allChrs_FILE.assoc 
+cat maf001rsq03minimums_chr*.info | grep -v 'Rsq' > allChrs_FILE.Info
+```
+Then in reformat in R
+```
+R
+# note1 you can speed this up with the data.table package and changing read.table and write.table to fread and fwrite
+# note2 we set here beta filtering at <5 and >-5 since typically these are unrealistic beta's coming from GWAS
+infos <- read.table(paste("allChrs_FILE.Info"))
+colnames(infos) <- c("SNP","ALT_Frq","Rsq")
+assoc <- read.table(paste("allChrs_FILE.assoc"))
+colnames(assoc) <- c("CHROM","POS","REF","ALT","N_INFORMATIVE","Test","Beta","SE","Pvalue")
+data <- merge(infos, assoc, by.x = "SNP", by.y = "Test", all.y = T)
+dat <- subset(data, Beta < 5 & Beta > -5 & !is.na(data$Pvalue))
+dat$chr <- paste("chr",dat$CHROM, sep = "")
+dat$markerID <- paste(dat$chr,dat$POS, sep = ":")
+dat$minorAllele <- ifelse(dat$ALT_Frq <= 0.5, as.character(dat$ALT), as.character(dat$REF))
+dat$majorAllele <- ifelse(dat$ALT_Frq <= 0.5, as.character(dat$REF), as.character(dat$ALT))
+dat$beta <- ifelse(dat$ALT_Frq <= 0.5, dat$Beta, dat$Beta*-1)
+dat$se <- dat$SE
+dat$maf <- ifelse(dat$ALT_Frq <= 0.5, dat$ALT_Frq, 1 - dat$ALT_Frq)
+dat$P <- dat$Pvalue
+dat0 <- dat[,c("markerID","minorAllele","majorAllele","beta","se","maf","P")]
+write.table(dat0, file=paste("toMeta.FILE.tab"), quote = F, sep = "\t", row.names = F)
+```
 
 ## Create a metal file 
 Create a metal file that looks like below and save it as my_metal_analysis.txt
