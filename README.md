@@ -15,18 +15,35 @@ Roughly the pipeline can be divided into four steps:
 
 
 # 1. QC and data cleaning
-The QC and data cleaning is very important prior imputation since the cleaner data you put in there the better and more accurate data you will get out.
+The QC and data cleaning is very important prior imputation since the cleaner data you put in there the better and more accurate data you will get out. PLINK and GCTA are very easy program for doing this.
 
 ## Sample QC parameters
 
 ```
-work in progress
+- Heterozygosity outliers (--het), F cut-off of -0.15 and <- 0.15 for inclusion 
+High or low heterozygosity is an indication of failed experiments or contamination of DNA sample
+
+- Call rate outliers (--mind), Call rate of >95% is preferred which is --mind 0.05
+Low call rate is an indication of a failed experiment
+
+- Genetic sex fails (--check-sex), F cut-off of 0.25 and 0.75 for inclusion --check-sex 0.25 0.75
+Genetic sex fails are indication of a failed experiment or a sample-switch
+
+# optional steps depending general purpose of data cleaning
+- No ancestry outliers -> based on Hapmap3 PCA data, should be near combined CEU/TSI, 6SD+/-
+- No relatedness (--grm-cutoff), Typically this would be set at 0.125 to remove cousins or more related individuals
+
 ```
 
 ## Variant QC parameters
 
 ```
-work in progress
+- Missingness by case control (--test-missing), using P > 1E-4
+- Missing by haplotype (--test-mishap), using P > 1E-4
+- Hardy Weinberg SNP from controls only (--filter-controls --hwe 1E-4)
+
+# optional steps depending general purpose of data cleaning 
+- Minor allele frequency (--geno), In some instances this might not be used if specific rare variants are on your array that you do not want to exclude.
 ```
 
 ## Preparation of data prior to submission to Imputation server
