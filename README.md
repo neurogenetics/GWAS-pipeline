@@ -108,7 +108,8 @@ For running GWAS many many tools and programs are available. We most commonly us
 ## Covariate generation
 Covariates should always be included when running GWAS, we typically include at least AGE, SEX and PC1-5. AGE and SEX you (hopefully) already have. PC1-5 you can generate using several programs we typically use either PLINK or FlashPCA for this.
 
-PLINK:
+PLINK
+more info here -> https://www.cog-genomics.org/plink2
 ```
 # Filter data (you can speed up things by adding --memory 119500 --threads 19 in PLINK)
 plink --bfile FILENAME --maf 0.01 --geno 0.01 --hwe 5e-6 --autosome --exclude exclusion_regions_hg19.txt 
@@ -123,6 +124,7 @@ plink --bfile FILENAME_3 --pca --out PCA
 ```
 
 FlashPCA (you can speed up things by adding --numthreads 19 in FlashPCA)
+more info here -> https://github.com/gabraham/flashpca
 ```
 # Filter data
 plink --bfile FILENAME --maf 0.01 --geno 0.01 --hwe 5e-6 --autosome --exclude exclusion_regions_hg19.txt 
@@ -133,7 +135,7 @@ plink --bfile FILENAME_2 --indep-pairwise 1000 10 0.02 --autosome --out pruned_d
 plink --bfile FILENAME_2 --extract pruned_data.prune.in --make-bed --out FILENAME_3 
 # Calculate/generate PCs based on pruned data set
 flashpca --bfile FILENAME_3 --suffix _filter_pruned_forPCA.txt --numthreads 19
-# then use the .* file
+# then use the pcs_* file
 ```
 
 Note that it is recommend (by FlashPCA authors and others) to exclude some regions prior creating PC's
