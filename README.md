@@ -19,14 +19,19 @@ The QC and data cleaning is very important prior imputation since the cleaner da
 
 ## Sample QC parameters
 
-
+```
+work in progress
+```
 
 ## Variant QC parameters
 
+```
+work in progress
+```
 
-## preparation of data prior to submission to Imputation server
+## Preparation of data prior to submission to Imputation server
 
-prepare data for HRC imputation Will Rayner tool
+Prepare data for HRC imputation Will Rayner tool
 
 
 # 2. Imputation
@@ -115,10 +120,26 @@ sample3	sample3	0	0	2	1	1	0	78	dataset2	0.00596214	0.0154845	0.00780206	0.083266
 
 ### Regions file
 This makes sure that you don't include low (imputation) quality and low frequency variants.
-The code below creates two files:
-- maf001rsq03minimums_chr22.info, this is 
-- maf001rsq03minimums_chr22.txt, this is 
+The code below creates two files, which are useful for when running GWAS and reformating the GWAS output
 
+- maf001rsq03minimums_chr22.info, this is file looks like this:
+```
+SNP    ALT_Frq    Rsq
+22:17029525    0.9407    0.5927
+22:17030029    0.94073    0.59404
+22:17030126    0.94039    0.59182
+22:17030792    0.94112    0.60053
+```
+
+- maf001rsq03minimums_chr22.txt, this is file looks like this:
+```
+22:17029525-17029525
+22:17030029-17030029
+22:17030126-17030126
+22:17030792-17030792
+```
+
+Code to run in R:
 
 ```
 R
@@ -183,6 +204,7 @@ rvtest --noweb --hide-covar --rangeFile maf001rsq03minimums_chr$CHNUM.txt \
 ```
 
 ## option explanation
+```
 --noweb  == to ignore web-check
 --hide-covar  == hide covariates 
 --rangeFile maf001rsq03minimums_chr$CHNUM.txt  == the file made at STEP2
@@ -195,6 +217,7 @@ rvtest --noweb --hide-covar --rangeFile maf001rsq03minimums_chr$CHNUM.txt \
 --covar $PHENO.pheno.txt  == link to the phenotype file from STEP1
 --covar-name SEX_COV,PC1,PC2,PC3,PC4,PC5  == name(s) of the covariates from the phenotype file from STEP1
 --peopleIncludeFile $KEEPFILE.txt  == keep file from STEP1
+```
 
 ## PLINK
 Why PLINK? It is very easy to use, it has a good manual and it has very flexible options to use.
@@ -227,7 +250,7 @@ PLINK: https://www.ncbi.nlm.nih.gov/pubmed/25722852
 # 4. Optional meta-analyses
 Meta-analyses are used when you have multiple datasets.
 
-## create a metal file 
+## Create a metal file 
 Create a metal file that looks like below and save it as my_metal_analysis.txt
 
 ```
@@ -277,7 +300,7 @@ ANALYZE HETEROGENEITY
 QUIT
 ``` 
 
-## run metal
+## Run metal
 
 Then run metal like this:
 
@@ -285,13 +308,14 @@ Then run metal like this:
 metal metal.txt
 ```
 
-## output will look something like this:
+## Output will look something like this:
 These are a couple of lines from one a recent GWAS, including 17 datasets. 
 
 ```
 MarkerName      Allele1 Allele2 Freq1   FreqSE  MinFreq MaxFreq Effect  StdErr  P-value Direction       HetISq  HetChiSq        HetDf   HetPVal
 chr4:90666041   t       c       0.6036  0.0229  0.5505  0.6295  0.6980  0.1169  2.348e-09       +-++++++-++++++++       40.4    26.827  16      0.04344
-chr9:95209476	a	g	0.8758	0.0120	0.8515	0.8968	-0.0000	0.1914	-++?++++?++---+++	9.0	15.383	14	0.3525
+chr3:8379719	a	g	0.2688	0.0101	0.2534	0.2884	0.0006	0.1582	0.997	-+-?+?-+??--++--+	0.0	8.536	12	0.742
+
 ```
 A couple of notes:
 
