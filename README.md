@@ -19,15 +19,41 @@ The QC and data cleaning is very important prior imputation since the cleaner da
 
 ## Sample QC parameters
 
-```
+
 - Heterozygosity outliers (--het), F cut-off of -0.15 and <- 0.15 for inclusion 
 High or low heterozygosity is an indication of failed experiments or contamination of DNA sample
+
+```
+plink --bfile $FILENAME --geno 0.01 --maf 0.05 --indep-pairwise 50 5 0.5 --out pruning
+plink --bfile $FILENAME --extract pruning.prune.in --make-bed --out pruned_data
+plink --bfile pruned_data --het --out prunedHet
+awk '{if ($6 <= -0.15) print $0 }' prunedHet.het > outliers1.txt
+awk '{if ($6 >= 0.15) print $0 }' prunedHet.het > outliers2.txt
+cat outliers1.txt outliers2.txt > HETEROZYGOSITY_OUTLIERS.txt
+cut -f 1,2 HETEROZYGOSITY_OUTLIERS.txt > all_outliers.txt
+plink --bfile $FILENAME --remove all_outliers.txt --make-bed --out $FILENAME_after_heterozyg
+```
 
 - Call rate outliers (--mind), Call rate of >95% is preferred which is --mind 0.05
 Low call rate is an indication of a failed experiment
 
+```
+plink --bfile $FILENAME --mind 0.05 --make-bed --out $FILENAME_after_call_rate
+mv after_heterozyg_call_rate.irem CALL_RATE_OUTLIERS.txt
+```
+
 - Genetic sex fails (--check-sex), F cut-off of 0.25 and 0.75 for inclusion --check-sex 0.25 0.75
 Genetic sex fails are indication of a failed experiment or a sample-switch
+
+```
+plink --bfile $FILENAME --chr 23 --from-bp 2699520 --to-bp 154931043 --maf 0.05 --geno 0.05 --hwe 1E-5 --check-sex  0.25 0.75 --out gender_check2 
+grep "PROBLEM" gender_check1.sexcheck > problems1.txt
+grep "PROBLEM" gender_check2.sexcheck > problems2.txt
+cat problems1.txt problems2.txt > GENDER_FAILURES.txt
+cut -f 1,2 GENDER_FAILURES.txt > samples_to_remove.txt
+plink --bfile $FILENAME --remove samples_to_remove.txt --make-bed --out $FILENAME_after_gender
+```
+
 
 # optional steps depending general purpose of data cleaning
 - No ancestry outliers -> based on Hapmap3 PCA data, should be near combined CEU/TSI, 6SD+/-
