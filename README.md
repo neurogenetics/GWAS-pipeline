@@ -14,7 +14,7 @@ Roughly the pipeline can be divided into four steps:
 4. Optional meta-analyses
 
 
-# QC and data cleaning
+# 1. QC and data cleaning
 The QC and data cleaning is very important prior imputation since the cleaner data you put in there the better and more accurate data you will get out.
 
 ## Sample QC parameters
@@ -29,7 +29,7 @@ The QC and data cleaning is very important prior imputation since the cleaner da
 prepare data for HRC imputation Will Rayner tool
 
 
-# Imputation
+# 2. Imputation
 Imputation will be done using the Michigan Imputation Server (BIG THANKS TO THEM FOR MAKING OUR LIVES SO MUCH EASIER!!)
 
 https://imputationserver.sph.umich.edu/index.html
@@ -80,8 +80,13 @@ HRC panel: https://www.ncbi.nlm.nih.gov/pubmed/27548312
 Eagle Imputation: https://www.ncbi.nlm.nih.gov/pubmed/27694958
 
 
-# GWAS
+# 3. GWAS
 For running GWAS many many tools and programs are available. We most commonly use either RVTESTS or PLINK. 
+
+## Covariate files
+
+
+
 
 ## RVTESTS
 Why RVTESTS? It is very easy to use due to the similar file structure as PLINK takes, it has a good manual and it has very flexible options to use.
@@ -98,13 +103,38 @@ Structure is very similar to PLINK:
 
 ### Regions file
 This makes sure that you don't include low (imputation) quality and low frequency variants.
+The code below creates two files:
+- maf001rsq03minimums_chr22.info
+- maf001rsq03minimums_chr22.txt
+
 
 ```
+R
+library(plyr)
+# note1 you can speed this up with the data.table package and changing read.table and write.table to fread and fwrite
+# note2 if you already unzipped your info.gz files update this to .info
+for(i in 1:22)
+{
+  input <- paste("chr",i,".info.gz", sep = "")
+  data <- read.table(input, header = T)
+  dat <- subset(data, MAF >= 0.001 & Rsq >= 0.30)
+  dat$chr <- ldply(strsplit(as.character(dat$SNP), split = ":"))[[1]]
+  dat$bp <- ldply(strsplit(as.character(dat$SNP), split = ":"))[[2]]
+  da <- dat[,c("SNP","ALT_Frq","Rsq")]
+  write.table(da, paste("maf001rsq03minimums_chr",i,".info",sep = ""), row.names = F, quote = F, sep = "\t")
+}
 
-
-some code
-
-
+for(i in 1:22)
+{
+  input <- paste("chr",i,".info.gz", sep = "")
+  data <- read.table(input, header = T)
+  dat <- subset(data, MAF >= 0.001 & Rsq >= 0.30)
+  dat$chr <- ldply(strsplit(as.character(dat$SNP), split = ":"))[[1]]
+  dat$bp <- ldply(strsplit(as.character(dat$SNP), split = ":"))[[2]]
+  dat$range <- paste(dat$chr, ":", dat$bp, "-", dat$bp, sep = "")
+  da <- dat[,c("range")]
+  write.table(da, paste("maf001rsq03minimums_chr",i,".txt",sep = ""), col.names = F, row.names = F, quote = F, sep = "\t")
+}
 
 ```
 
@@ -145,7 +175,7 @@ RVTESTS:
 PLINK:
 
 
-# Optional meta-analyses
+# 4. Optional meta-analyses
 Meta-analyses are used when you have multiple datasets 
 
 
