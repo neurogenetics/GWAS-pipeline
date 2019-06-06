@@ -117,7 +117,39 @@ plink --bfile $FILENAME --maf 0.01 --make-bed --out $FILENAME_MAF
 
 ## Preparation of data prior to submission to Imputation server
 
-Prepare data for HRC imputation Will Rayner tool
+Prepare data for HRC imputation using Will Rayner tool and continue with the plink file that is cleaned with the above described options.
+
+
+```
+# download file to check
+wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim.v4.2.5.zip
+
+# make your .frq file
+plink --bfile $FILENAME --freq --out $FILENAME
+
+perl HRC-1000G-check-bim.pl -b $FILENAME.bim -f $FILENAME.frq -r HRC.r1-1.GRCh37.wgs.mac5.sites.tab -h
+
+# then run to fix your data
+sh Run-plink.sh
+
+# then make vcf files
+
+for chnum in {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+  do
+  plink --bfile YOURFILE-updated-chr$chnum --recode vcf --chr $chnum --out YOURFILE$chnum 
+done
+
+## then sort and zip
+
+module load vcftools
+
+for chnum in {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+  do
+	vcf-sort YOURFILE$chnum.vcf | bgzip -c >  pre_impute_YOURFILE_$chnum.vcf.gz
+done
+
+# and then you are ready to submit to the imputation server
+```
 
 
 # 2. Imputation
