@@ -108,9 +108,9 @@ For running GWAS many many tools and programs are available. We most commonly us
 ## Covariate generation
 Covariates should always be included when running GWAS, we typically include at least AGE, SEX and PC1-5. AGE and SEX you (hopefully) already have. PC1-5 you can generate using several programs we typically use either PLINK or FlashPCA for this.
 
-Plink:
+PLINK:
 ```
-# Filter data
+# Filter data (you can speed up things by adding --memory 119500 --threads 19 in PLINK)
 plink --bfile FILENAME --maf 0.01 --geno 0.01 --hwe 5e-6 --autosome --exclude exclusion_regions_hg19.txt 
 --make-bed --out FILENAME_2  
 # Prune snps 
@@ -122,7 +122,7 @@ plink --bfile FILENAME_3 --pca --out PCA
 # then use the .eigenvec file
 ```
 
-FlashPCA (you can speed up things by adding --memory 119500 --threads 19 in PLINK and --numthreads 19 in FlashPCA
+FlashPCA (you can speed up things by adding --numthreads 19 in FlashPCA)
 ```
 # Filter data
 plink --bfile FILENAME --maf 0.01 --geno 0.01 --hwe 5e-6 --autosome --exclude exclusion_regions_hg19.txt 
