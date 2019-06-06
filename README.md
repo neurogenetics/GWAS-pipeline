@@ -5,7 +5,7 @@ Date: June 2019
 Authors: Cornelis Blauwendraat, Mike Nalls
 
 ## General description and purpose
-This is a general description of the LNG GWAS pipeline which can be used to guide researchers on how-to run a GWAS
+This is a general (somewhat comprehensive) description of the LNG GWAS pipeline which can be used to guide researchers on how-to run a GWAS.
 Roughly the pipeline can be divided into four steps:
 
 1. QC and data cleaning
@@ -83,7 +83,7 @@ Eagle Imputation: https://www.ncbi.nlm.nih.gov/pubmed/27694958
 # 3. GWAS
 For running GWAS many many tools and programs are available. We most commonly use either RVTESTS or PLINK. 
 
-## Covariate files
+## Covariate generation
 
 
 
@@ -97,15 +97,27 @@ Files needed to run GWAS:
 3. Imputed genotype data
 
 ### Phenotype file
-Structure is very similar to PLINK:
-.....
+Structure is very similar to PLINK. We generally add a couple of columns such as: SEX_cov,pheno_01,AGE,dataset,PC1-PC10
+
+- SEX_cov is sex-1 this is because some programs prefer binairy coding of covariates over 1 and 2
+- pheno_01 is pheno-1 this is again because some programs prefer binairy coding of phenotypes over 1 and 2
+- AGE is for some phenotypes very important so would always recommend including this
+- dataset is the data origin and can be an important covariate in some instances
+- PC1-PC10 are the principal components created as above described.
+
+```
+FID	IID	patid	matid	sex	pheno	SEX_cov	pheno_01	AGE	dataset	PC1	PC2	PC3	PC4	PC5	PC6	PC7	PC8	PC9	PC10
+sample1	sample1	0	0	1	2	0	1	56	dataset1	0.0128029	0.00134518	-0.0132907	0.00909855	-0.00238954	0.0327338	-0.00984243	-0.0295871	-0.00869277	0.0112763
+sample2	sample2	0	0	2	1	1	0	48	dataset1	0.0149187	0.00623717	0.00486343	-0.0384283	-0.00951609	-0.0304118	0.0293294	0.00264849	-0.0339268	-0.00915441
+sample3	sample3	0	0	2	1	1	0	78	dataset2	0.00596214	0.0154845	0.00780206	0.0832667	0.0516746	-0.0313716	0.00238327	-0.0361836	0.0244427	0.012373
+```
 
 
 ### Regions file
 This makes sure that you don't include low (imputation) quality and low frequency variants.
 The code below creates two files:
-- maf001rsq03minimums_chr22.info
-- maf001rsq03minimums_chr22.txt
+- maf001rsq03minimums_chr22.info, this is 
+- maf001rsq03minimums_chr22.txt, this is 
 
 
 ```
@@ -113,6 +125,8 @@ R
 library(plyr)
 # note1 you can speed this up with the data.table package and changing read.table and write.table to fread and fwrite
 # note2 if you already unzipped your info.gz files update this to .info
+# note3 you can change the MAF and Rsq filter to whatever you think is appropriate 
+
 for(i in 1:22)
 {
   input <- paste("chr",i,".info.gz", sep = "")
@@ -142,43 +156,156 @@ for(i in 1:22)
 
 This is the .vcf file that is the output from the imputation server
 
+### Running the GWAS
+
+Can start like this:
+```
+sbatch --cpus-per-task=10 --mem=48g --time=8:00:00 GWAS_per_chr.sh PHENO CHNUM KEEPFILE 
+```
+or simpler if not having a slurm submission system
+```
+sh GWAS_per_chr.sh PHENO CHNUM KEEPFILE 
+```
+
+```
+#!/bin/bash
+PHENO=$1
+CHNUM=$2
+KEEPFILE=$3
+
+cd /the/location/of/your/files/
+
+rvtest --noweb --hide-covar --rangeFile maf001rsq03minimums_chr$CHNUM.txt \
+--out $PHENO.$KEEPFILE.chr$CHNUM --single wald \
+--inVcf chr$CHNUM.dose.vcf.gz --dosage DS --pheno $PHENO.pheno.txt \
+--pheno-name pheno --covar $PHENO.pheno.txt \
+--covar-name SEX_COV,PC1,PC2,PC3,PC4,PC5 --peopleIncludeFile $KEEPFILE.txt
+```
+
+## option explanation
+--noweb  == to ignore web-check
+--hide-covar  == hide covariates 
+--rangeFile maf001rsq03minimums_chr$CHNUM.txt  == the file made at STEP2
+--out $PHENO.$KEEPFILE.chr$CHNUM  == the location and name of your output file(s)
+--single wald  == type of test to use see for more tests-> http://zhanxw.github.io/rvtests/
+--inVcf chr$CHNUM.dose.vcf.gz == VCF file as input
+--dosage DS  == tells the program to use dosage format from your .vcf files
+--pheno $PHENO.pheno.txt  == link to the phenotype file from STEP1
+--pheno-name pheno   == name of the phenotype from the phenotype file from STEP1
+--covar $PHENO.pheno.txt  == link to the phenotype file from STEP1
+--covar-name SEX_COV,PC1,PC2,PC3,PC4,PC5  == name(s) of the covariates from the phenotype file from STEP1
+--peopleIncludeFile $KEEPFILE.txt  == keep file from STEP1
 
 ## PLINK
 Why PLINK? It is very easy to use, it has a good manual and it has very flexible options to use.
+PLINK2 is often used, but typically that means version 1.9. The actual PLINK2 version is still under development and the first releases look very promising (https://www.cog-genomics.org/plink/2.0/) incredibly fast.
+
 
 ### Phenotype file
 Structure is very similar to PLINK:
-.....
-
-
-### Regions file
-This makes sure that you don't include low (imputation) quality and low frequency variants.
-
+``` 
+work in progress
 ```
 
-
-some code
-
-
-
-```
 
 ### Imputed genotype data
 
 This is the .vcf file that is the output from the imputation server
+``` 
+work in progress
+```
+
 
 
 ### References:
 
-RVTESTS:
+RVTESTS: https://www.ncbi.nlm.nih.gov/pubmed/27153000
 
-PLINK:
+PLINK: https://www.ncbi.nlm.nih.gov/pubmed/25722852
 
 
 # 4. Optional meta-analyses
-Meta-analyses are used when you have multiple datasets 
+Meta-analyses are used when you have multiple datasets.
+
+## create a metal file 
+Create a metal file that looks like below and save it as my_metal_analysis.txt
+
+```
+#../generic-metal/metal metalAll.txt
+#THIS SCRIPT EXECUTES AN ANALYSIS OF EIGHT STUDIES
+#THE RESULTS FOR EACH STUDY ARE STORED IN FILES Inputfile1.txt THROUGH Inputfile8.txt
+SCHEME  STDERR
+AVERAGEFREQ ON
+MINMAXFREQ ON
+# LOAD THE FIRST SEVEN INPUT FILES
+
+# UNCOMMENT THE NEXT LINE TO ENABLE GenomicControl CORRECTION
+# GENOMICCONTROL ON
+
+# === DESCRIBE AND PROCESS THE FIRST INPUT FILE ===
+MARKER markerID
+ALLELE minorAllele majorAllele
+FREQ   maf
+EFFECT beta
+STDERR se
+PVALUE P
+PROCESS toMeta.GWAS1.tab
+
+# === DESCRIBE AND PROCESS THE SECOND INPUT FILE ===
+MARKER markerID
+ALLELE minorAllele majorAllele
+FREQ   maf
+EFFECT beta
+STDERR se
+PVALUE P
+PROCESS toMeta.GWAS2.tab
+
+
+# === DESCRIBE AND PROCESS THE SIXTH INPUT FILE ===
+MARKER markerID
+ALLELE minorAllele majorAllele
+FREQ   maf
+EFFECT beta
+STDERR se
+PVALUE P
+PROCESS toMeta.GWAS3.tab
+
+
+OUTFILE MY_THREE_GWAS_FILES_META .tbl
+ANALYZE HETEROGENEITY
+
+QUIT
+``` 
+
+## run metal
+
+Then run metal like this:
+
+```
+metal metal.txt
+```
+
+## output will look something like this:
+These are a couple of lines from one a recent GWAS, including 17 datasets. 
+
+```
+MarkerName      Allele1 Allele2 Freq1   FreqSE  MinFreq MaxFreq Effect  StdErr  P-value Direction       HetISq  HetChiSq        HetDf   HetPVal
+chr4:90666041   t       c       0.6036  0.0229  0.5505  0.6295  0.6980  0.1169  2.348e-09       +-++++++-++++++++       40.4    26.827  16      0.04344
+chr9:95209476	a	g	0.8758	0.0120	0.8515	0.8968	-0.0000	0.1914	-++?++++?++---+++	9.0	15.383	14	0.3525
+```
+A couple of notes:
+
+For the direction three options are possible +,- and ?. ? means the variant was not present in that dataset, + means positive beta and - means negative beta value.
+The HetDf value is the number of included datasets for the variant -1 
 
 
 ### References:
 
-METAL:
+METAL: https://www.ncbi.nlm.nih.gov/pubmed/20616382
+
+
+# That's it.... Good luck!
+
+
+
+
