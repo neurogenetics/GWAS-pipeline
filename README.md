@@ -393,13 +393,24 @@ chr3:8379719	a	g	0.2688	0.0101	0.2534	0.2884	0.0006	0.1582	0.997	-+-?+?-+??--++-
 ```
 A couple of notes:
 
-For the direction three options are possible +,- and ?. ? means the variant was not present in that dataset, + means positive beta and - means negative beta value.
+For the Direction column three options are possible +,- and ?. ? means the variant was not present in that dataset, + means positive beta and - means negative beta value.
 The HetDf value is the number of included datasets for the variant -1 
+Note the it is also recommend to filter for HetISq, anything higher than 80 is not reliable.
 
+Also optional sorting and filtering:
+```
+# column 10 is the p-value column
+sort -gk 10 META_ALL_DATA1.tbl > SORTED_META_ALL_DATA1.tbl
+```
 
 ### References:
 
 METAL: https://www.ncbi.nlm.nih.gov/pubmed/20616382
+
+
+
+
+
 
 
 # That's it.... Good luck!
