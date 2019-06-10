@@ -2,7 +2,7 @@
 
 Date: June 2019
 
-Authors: Cornelis Blauwendraat, Mike Nalls
+Authors: Cornelis Blauwendraat, Mike Nalls + the rest of LNG data team
 
 ## General description and purpose
 This is a general (somewhat comprehensive) description of the LNG GWAS pipeline which can be used to guide researchers on how-to run a GWAS.
