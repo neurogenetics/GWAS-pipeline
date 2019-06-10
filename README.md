@@ -12,6 +12,7 @@ Roughly the pipeline can be divided into four steps:
 2. Imputation
 3. GWAS
 4. Optional meta-analyses
+5. Results visualization 
 
 
 # 1. QC and data cleaning
@@ -540,6 +541,25 @@ sort -gk 10 META_ALL_DATA1.tbl > SORTED_META_ALL_DATA1.tbl
 ### References:
 
 METAL: https://www.ncbi.nlm.nih.gov/pubmed/20616382
+
+
+# 5. Results visualization 
+Results visualization are crucial to explain and inspect the results. You can look at your results using Manhattan plot and QQ-plot. Also it is good to check the Lambda value from your GWAS.
+
+
+## Manhattan plot
+
+See here a great way of making a Manhattan plot:
+https://github.com/ipdgc/Manhattan-Plotter
+
+## QQ-plot
+
+Making the QQ plot is a way to vizualize the potential inflation
+
+## Lambda value
+
+
+
 
 
 
