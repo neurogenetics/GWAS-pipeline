@@ -6,7 +6,7 @@ Authors: Cornelis Blauwendraat, Mike Nalls + the rest of LNG data team
 
 ## General description and purpose
 This is a general (somewhat comprehensive) description of the LNG GWAS pipeline which can be used to guide researchers on how-to run a GWAS.
-Roughly the pipeline can be divided into four steps:
+Roughly the pipeline can be divided into five steps:
 
 1. QC and data cleaning
 2. Imputation
