@@ -415,7 +415,26 @@ This is the .vcf file that is the output from the imputation server
 work in progress
 ```
 
+### PLINK 1.9
+Example 1
+``` 
+work in progress
+```
 
+### PLINK 2
+Example 1
+``` 
+work in progress
+```
+
+## Option3: Linear mixed model
+Why linear mixed model?
+
+
+Example 1
+``` 
+work in progress
+```
 
 ### References:
 
