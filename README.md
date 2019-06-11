@@ -60,7 +60,7 @@ cut -f 1,2 GENDER_FAILURES.txt > samples_to_remove.txt
 plink --bfile $FILENAME --remove samples_to_remove.txt --make-bed --out $FILENAME_after_gender
 ```
 
-# optional steps depending general purpose of data cleaning
+## optional steps depending general purpose of data cleaning
 - No ancestry outliers -> based on Hapmap3 PCA data, should be near combined CEU/TSI, 6SD+/-
 
 ```
