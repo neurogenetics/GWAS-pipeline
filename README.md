@@ -488,6 +488,7 @@ Create a metal file that looks like below and save it as my_metal_analysis.txt
 SCHEME  STDERR
 AVERAGEFREQ ON
 MINMAXFREQ ON
+LABEL TotalSampleSize as N # If input files have a column for the sample size labeled as 'N'
 # LOAD THE FIRST SEVEN INPUT FILES
 
 # UNCOMMENT THE NEXT LINE TO ENABLE GenomicControl CORRECTION
@@ -500,6 +501,7 @@ FREQ   maf
 EFFECT beta
 STDERR se
 PVALUE P
+WEIGHT N 
 PROCESS toMeta.GWAS1.tab
 
 # === DESCRIBE AND PROCESS THE SECOND INPUT FILE ===
@@ -509,6 +511,7 @@ FREQ   maf
 EFFECT beta
 STDERR se
 PVALUE P
+WEIGHT N
 PROCESS toMeta.GWAS2.tab
 
 
@@ -519,6 +522,7 @@ FREQ   maf
 EFFECT beta
 STDERR se
 PVALUE P
+WEIGHT N
 PROCESS toMeta.GWAS3.tab
 
 
@@ -540,9 +544,9 @@ metal metal.txt
 These are a couple of lines from one a recent GWAS, including 17 datasets. 
 
 ```
-MarkerName      Allele1 Allele2 Freq1   FreqSE  MinFreq MaxFreq Effect  StdErr  P-value Direction       HetISq  HetChiSq        HetDf   HetPVal
-chr4:90666041   t       c       0.6036  0.0229  0.5505  0.6295  0.6980  0.1169  2.348e-09       +-++++++-++++++++       40.4    26.827  16      0.04344
-chr3:8379719	a	g	0.2688	0.0101	0.2534	0.2884	0.0006	0.1582	0.997	-+-?+?-+??--++--+	0.0	8.536	12	0.742
+MarkerName      Allele1 Allele2 Freq1   FreqSE  MinFreq MaxFreq Effect  StdErr  P-value Direction       HetISq  HetChiSq        HetDf   HetPVal TotalSampleSize
+chr4:90666041   t       c       0.6036  0.0229  0.5505  0.6295  0.6980  0.1169  2.348e-09       +-++++++-++++++++       40.4    26.827  16      0.04344 138030
+chr3:8379719	a	g	0.2688	0.0101	0.2534	0.2884	0.0006	0.1582	0.997	-+-?+?-+??--++--+	0.0	8.536	12	0.742 140900
 
 ```
 A couple of notes:
