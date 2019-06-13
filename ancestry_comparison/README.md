@@ -16,11 +16,11 @@ HAPMAP_hg19_new.bim
 # neuroX_snps_for_hapmap_conversion.txt # conversion of IDs --update-map
 # Keep in mind that this comparison with hapmap is based on the number of SNPs that overlap between your input dataset and hapmap
 
-plink --bfile FILENAME --bmerge HAPMAP_hg19_new --out hapmap3_bin_snplis --make-bed
-plink --bfile FILENAME --flip hapmap3_bin_snplis-merge.missnp --make-bed --out FILENAME3
-plink --bfile FILENAME3 --bmerge HAPMAP_hg19_new --out hapmap3_bin_snplis --make-bed
-plink --bfile FILENAME3 --exclude hapmap3_bin_snplis-merge.missnp --out FILENAME4 --make-bed
-plink --bfile FILENAME4 --bmerge HAPMAP_hg19_new --out hapmap3_bin_snplis --make-bed
+plink --bfile $FILENAME --bmerge HAPMAP_hg19_new --out hapmap3_bin_snplis --make-bed
+plink --bfile $FILENAME --flip hapmap3_bin_snplis-merge.missnp --make-bed --out $FILENAME3
+plink --bfile $FILENAME3 --bmerge HAPMAP_hg19_new --out hapmap3_bin_snplis --make-bed
+plink --bfile $FILENAME3 --exclude hapmap3_bin_snplis-merge.missnp --out $FILENAME4 --make-bed
+plink --bfile $FILENAME4 --bmerge HAPMAP_hg19_new --out hapmap3_bin_snplis --make-bed
 plink --bfile hapmap3_bin_snplis --geno 0.01 --out pca --make-bed --pca 4
 
 # then add some names here and there
@@ -39,7 +39,7 @@ cat new_samples2.txt euro.txt asiao.txt afrio.txt > pca.eigenvec2
 R < PCA_in_R.R --no-save  
 
 # then back to plink to remove outliers
-plink --bfile FILENAME --keep PCA_filtered_europeans.txt --make-bed --out after_gender_heterozyg_hapmap
+plink --bfile $FILENAME --keep PCA_filtered_europeans.txt --make-bed --out after_gender_heterozyg_hapmap
 cat PCA_filtered_asians.txt PCA_filtered_africans.txt PCA_filtered_mixed_race.txt > hapmap_outliers.txt
 # this creates several plots and lists based on genetic ancestry
 ```
