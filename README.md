@@ -2,7 +2,7 @@
 
 Date: June 2019
 
-Authors: Cornelis Blauwendraat, Mike Nalls + the rest of LNG data team
+Authors: Cornelis Blauwendraat, Mike Nalls, Hirotaka Iwaki, Sara Bandres-Ciga, Mary Makarious, Ruth Chia, Frank Grenn, Hampton Leonard, Monica Diez-Fairen, Jeff Kim 
 
 ## General description and purpose
 This is a general (somewhat comprehensive) description of the LNG GWAS pipeline which can be used to guide researchers on how-to run a GWAS.
@@ -42,7 +42,7 @@ Low call rate is an indication of a failed experiment
 
 ```
 plink --bfile $FILENAME --mind 0.05 --make-bed --out $FILENAME_after_call_rate
-mv after_heterozyg_call_rate.irem CALL_RATE_OUTLIERS.txt
+mv $FILENAME_after_call_rate.irem CALL_RATE_OUTLIERS.txt
 ```
 
 - Genetic sex fails (--check-sex), F cut-off of 0.25 and 0.75 for inclusion --check-sex 0.25 0.75
@@ -52,6 +52,7 @@ Genetic sex fails are indication of a failed experiment or a sample-switch
 Note use 2,781,479 and 155,701,383 for hg38
 
 ```
+plink --bfile $FILENAME --check-sex 0.25 0.75 --maf 0.05 --out gender_check1
 plink --bfile $FILENAME --chr 23 --from-bp 2699520 --to-bp 154931043 --maf 0.05 --geno 0.05 --hwe 1E-5 --check-sex  0.25 0.75 --out gender_check2 
 grep "PROBLEM" gender_check1.sexcheck > problems1.txt
 grep "PROBLEM" gender_check2.sexcheck > problems2.txt
