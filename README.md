@@ -99,7 +99,7 @@ plink --bfile $FILENAME --exclude missing_snps_1E4.txt --make-bed --out $FILENAM
 ```
 plink --bfile $FILENAME --test-mishap --out missing_hap 
 awk '{if ($8 <= 0.0001) print $9 }' missing_hap.missing.hap > missing_haps_1E4.txt
-sed 's/|/\/g' missing_haps_1E4.txt > missing_haps_1E4_final.txt
+sed 's/|/\n/g' missing_haps_1E4.txt > missing_haps_1E4_final.txt
 plink --bfile $FILENAME --exclude missing_haps_1E4_final.txt --make-bed --out $FILENAME_missing2
 ```
 
