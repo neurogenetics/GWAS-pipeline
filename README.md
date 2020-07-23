@@ -2,6 +2,8 @@
 
 Date: June 2019
 
+#### NOTE!! see for a more updated version here => https://github.com/GP2code/GWAS
+
 Authors: Cornelis Blauwendraat, Mike Nalls, Hirotaka Iwaki, Sara Bandres-Ciga, Mary Makarious, Ruth Chia, Frank Grenn, Hampton Leonard, Monica Diez-Fairen, Jeff Kim 
 
 ## General description and purpose
