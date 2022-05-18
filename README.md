@@ -2,7 +2,7 @@
 
 Date: June 2019
 
-#### NOTE!! see for a more updated version here => https://github.com/GP2code/GWAS
+#### NOTE!! see for a more updated version here => https://github.com/GP2code/GenoTools
 
 Authors: Cornelis Blauwendraat, Mike Nalls, Hirotaka Iwaki, Sara Bandres-Ciga, Mary Makarious, Ruth Chia, Frank Grenn, Hampton Leonard, Monica Diez-Fairen, Jeff Kim 
 
